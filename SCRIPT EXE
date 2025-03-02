@@ -105,6 +105,94 @@ game:GetService("UserInputService").InputBegan:Connect(function(input)
     end
 end)
 
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local UserInputService = game:GetService("UserInputService")
+local Mouse = Player:GetMouse()
+
+-- Voar
+local flying = false
+function toggleFly()
+    flying = not flying
+    if flying then
+        Humanoid.PlatformStand = true
+        local bodyGyro = Instance.new("BodyGyro", Character.PrimaryPart)
+        local bodyVelocity = Instance.new("BodyVelocity", Character.PrimaryPart)
+        bodyGyro.P = 9e4
+        bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.Parent = Character.PrimaryPart
+        bodyVelocity.velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        bodyVelocity.Parent = Character.PrimaryPart
+    else
+        Humanoid.PlatformStand = false
+        Character.PrimaryPart:FindFirstChildOfClass("BodyGyro"):Destroy()
+        Character.PrimaryPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F then
+        toggleFly()
+    end
+end)
+
+-- Spawnar Objetos
+function spawnObject()
+    local newPart = Instance.new("Part")
+    newPart.Size = Vector3.new(4, 4, 4)
+    newPart.Position = Character.PrimaryPart.Position + Vector3.new(0, 5, 0)
+    newPart.Parent = workspace
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        spawnObject()
+    end
+end)
+
+-- Ficar Invisível
+function toggleInvisibility()
+    local children = Character:GetChildren()
+    for _, part in pairs(children) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = part.Transparency == 0 and 1 or 0
+        end
+        if part:IsA("Humanoid") then
+            for _, accessory in pairs(part:GetAccessories()) do
+                accessory.Handle.Transparency = accessory.Handle.Transparency == 0 and 1 or 0
+            end
+        end
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.G then
+        toggleInvisibility()
+    end
+end)
+
+-- Pegar Objetos
+Mouse.Button1Down:Connect(function()
+    if Mouse.Target and Mouse.Target:IsA("BasePart") then
+        Mouse.Target.Parent = Character
+    end
+end)
+
+-- Trocar a Velocidade do Personagem
+function changeSpeed(speed)
+    Humanoid.WalkSpeed = speed
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.T then
+        changeSpeed(50)  -- Alterar a velocidade para 50
+    elseif input.KeyCode == Enum.KeyCode.Y then
+        changeSpeed(16)  -- Velocidade padrão
+    end
+end)
+
 
 executarScript("meu_script.lua")
 
