@@ -193,6 +193,51 @@ UserInputService.InputBegan:Connect(function(input)
     end
 end)
 
+local Player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+-- Função para executar um script
+local function executarScript(scriptCodigo)
+    local success, err = pcall(function()
+        local func = loadstring(scriptCodigo)
+        func()
+    end)
+    if not success then
+        warn("Erro ao executar o script: " .. err)
+    else
+        print("Script executado com sucesso!")
+    end
+end
+
+-- Função para carregar um script de um TextBox na interface do jogador
+local function carregarScriptDoTextBox()
+    local screenGui = Instance.new("ScreenGui", Player.PlayerGui)
+    local textBox = Instance.new("TextBox", screenGui)
+    textBox.Size = UDim2.new(0, 400, 0, 300)
+    textBox.Position = UDim2.new(0.5, -200, 0.5, -150)
+    textBox.PlaceholderText = "Cole seu script Lua aqui"
+    textBox.TextWrapped = true
+    textBox.MultiLine = true
+    
+    local button = Instance.new("TextButton", screenGui)
+    button.Size = UDim2.new(0, 100, 0, 50)
+    button.Position = UDim2.new(0.5, -50, 0.5, 200)
+    button.Text = "Executar"
+
+    button.MouseButton1Click:Connect(function()
+        local scriptCodigo = textBox.Text
+        executarScript(scriptCodigo)
+        screenGui:Destroy()  -- Fechar a interface após a execução
+    end)
+end
+
+-- Detectar a tecla para abrir a interface do executor
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.P then  -- Tecla 'P' para abrir o executor
+        carregarScriptDoTextBox()
+    end
+end)
+
 
 executarScript("meu_script.lua")
 
