@@ -1,0 +1,149 @@
+lua executor.lua 
+
+-- Função para carregar e executar um script Lua a partir de um arquivo
+function executarScript(arquivo)
+    local f, err = loadfile(arquivo)
+    if not f then
+        print("Erro ao carregar o script: " .. err)
+        return
+    end
+    local success, result = pcall(f)
+    if not success then
+        print("Erro ao executar o script: " .. result)
+    else
+        print("Script executado com sucesso!")
+    end
+end
+
+-- Chamar a função com o caminho do arquivo do script Lua
+executarScript("caminho/para/seu/script.lua")
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local flying = false
+
+function toggleFly()
+    flying = not flying
+    if flying then
+        Humanoid.PlatformStand = true
+        local bodyGyro = Instance.new("BodyGyro", Character.PrimaryPart)
+        local bodyVelocity = Instance.new("BodyVelocity", Character.PrimaryPart)
+        bodyGyro.P = 9e4
+        bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyVelocity.velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        
+        -- Add flight control here
+    else
+        Humanoid.PlatformStand = false
+        Character.PrimaryPart:FindFirstChildOfClass("BodyGyro"):Destroy()
+        Character.PrimaryPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F then
+        toggleFly()
+    end
+end)
+
+function spawnObject()
+    local newPart = Instance.new("Part")
+    newPart.Size = Vector3.new(4, 4, 4)
+    newPart.Position = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(0, 5, 0)
+    newPart.Parent = workspace
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        spawnObject()
+    end
+end)
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+
+function toggleInvisibility()
+    local children = Character:GetChildren()
+    for _, part in pairs(children) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = part.Transparency == 0 and 1 or 0
+        end
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.G then
+        toggleInvisibility()
+    end
+end)
+
+local Player = game.Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+Mouse.Button1Down:Connect(function()
+    if Mouse.Target and Mouse.Target:IsA("BasePart") then
+        Mouse.Target.Parent = Player.Character
+    end
+end)
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+function changeSpeed(speed)
+    Humanoid.WalkSpeed = speed
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.T then
+        changeSpeed(50)  -- Alterar a velocidade para 50
+    elseif input.KeyCode == Enum.KeyCode.Y then
+        changeSpeed(16)  -- Velocidade padrão
+    end
+end)
+
+
+executarScript("meu_script.lua")
+
+meu_projeto/
+|-- main.lua
+|-- executor.lua
+|-- seu_script.lua
+
+-- executor.lua
+function executarScript(arquivo)
+    local f, err = loadfile(arquivo)
+    if not f then
+        return "Erro ao carregar o script: " .. err
+    end
+    local success, result = pcall(f)
+    if not success then
+        return "Erro ao executar o script: " .. result
+    else
+        return "Script executado com sucesso!"
+    end
+end
+
+-- main.lua
+local executor = require("executor")
+local resultado = ""
+
+function love.load()
+    love.window.setTitle("Executor de Scripts Lua")
+    love.window.setMode(800, 600)
+end
+
+function love.draw()
+    love.graphics.printf("Pressione 'E' para executar o script", 0, 50, 800, "center")
+    love.graphics.printf(resultado, 0, 100, 800, "center")
+end
+
+function love.keypressed(key)
+    if key == "e" then
+        resultado = executor.executarScript("seu_script.lua")
+    end
+end
+
